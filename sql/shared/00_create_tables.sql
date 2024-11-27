@@ -1,27 +1,18 @@
--- Установка расширения pglogical
-CREATE EXTENSION IF NOT EXISTS pglogical;
+-- Переключение на базу данных shared_db
+\c shared_db
 
--- Подписка на узлы
-DO $$ 
-BEGIN
-    IF (SELECT COUNT(*) FROM pglogical.node WHERE node_name = 'node1') = 0 THEN
-        SELECT pglogical.create_node(node_name := 'node1', dsn := 'host=ru-central1-a dbname=shared_db user=admin password=password');
-    END IF;
+-- Создание таблицы services
+CREATE TABLE services (
+    id SERIAL PRIMARY KEY,       -- Уникальный идентификатор услуги
+    name TEXT NOT NULL,          -- Название услуги
+    price NUMERIC(10, 2) NOT NULL, -- Цена услуги
+    currency CHAR(3) NOT NULL    -- Валюта услуги (например, USD, EUR)
+);
 
-    IF (SELECT COUNT(*) FROM pglogical.node WHERE node_name = 'node2') = 0 THEN
-        SELECT pglogical.create_node(node_name := 'node2', dsn := 'host=us-gov-east-1 dbname=shared_db user=admin password=password');
-    END IF;
+-- Пример вставки данных в таблицу
+INSERT INTO services (name, price, currency)
+VALUES 
+    ('Консультация специалиста', 50.00, 'USD'),
+    ('Аренда оборудования', 100.00, 'EUR'),
+    ('Обучение персонала', 200.00, 'USD');
 
-    IF (SELECT COUNT(*) FROM pglogical.node WHERE node_name = 'node3') = 0 THEN
-        SELECT pglogical.create_node(node_name := 'node3', dsn := 'host=eu-west-2 dbname=shared_db user=admin password=password');
-    END IF;
-END $$;
-
--- Настройка репликации для общих таблиц
-DO $$
-BEGIN
-    PERFORM pglogical.create_subscription(
-        subscription_name := 'common_tables_subscription',
-        provider_dsn := 'host=ru-central1-a dbname=shared_db user=admin password=password'
-    );
-END $$;

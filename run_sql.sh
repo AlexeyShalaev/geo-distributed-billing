@@ -1,40 +1,36 @@
 #!/bin/bash
 
-# Настройки подключения
-declare -A nodes=(
-    [node1]="host=ru-central1-a port=5432 user=admin password=password dbname=shared_db"
-    [node2]="host=us-gov-east-1 port=5432 user=admin password=password dbname=shared_db"
-    [node3]="host=eu-west-2 port=5432 user=admin password=password dbname=shared_db"
-)
+set -e  # Останавливаем выполнение при ошибке
 
-# Функция для выполнения SQL-файлов
-execute_sql() {
-    local node=$1
-    local dsn=$2
-    local dir=$3
+# Подключение к PostgreSQL
+DB_HOST=${DB_HOST:-localhost}
+DB_PORT=${DB_PORT:-5432}
+DB_USER=${DB_USER:-postgres}
+DB_PASSWORD=${DB_PASSWORD:-password}
+DB_NAME=${DB_NAME:-shared_db}
 
-    echo "Executing SQL scripts in $dir for $node..."
+# Функция выполнения SQL-файлов
+execute_sql_files() {
+    local dir=$1
+
+    echo "Executing SQL scripts in $dir..."
     for sql_file in "$dir"/*.sql; do
         if [[ -f "$sql_file" ]]; then
-            echo "Running $sql_file on $node..."
-            PGPASSWORD=${dsn#*password=} psql -h ${dsn%% *} -p ${dsn#*port=}; d=${d%% *}; d=shared_db \
-                -U ${dsn#*user=} -f "$sql_file" \
-                || { echo "Error executing $sql_file on $node. Exiting."; exit 1; }
+            echo "Running $sql_file..."
+            PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -f "$sql_file" \
+                || { echo "Error executing $sql_file. Exiting."; exit 1; }
         fi
     done
 }
 
-# Выполнение общих скриптов (только на node1)
-if [[ -d "sql/shared" ]]; then
-    execute_sql "node1" "${nodes[node1]}" "sql/shared"
+# Выполняем общие скрипты для node1
+if [[ "$DB_HOST" == "postgres1" ]] && [[ -d "/scripts/sql/shared" ]]; then
+    execute_sql_files "/scripts/sql/shared"
 fi
 
-# Выполнение уникальных скриптов для каждой ноды
-for node in "${!nodes[@]}"; do
-    if [[ -d "sql/$node" ]]; then
-        execute_sql "$node" "${nodes[$node]}" "sql/$node"
-    fi
-done
+# Выполняем уникальные скрипты для текущей ноды
+if [[ -d "/scripts/sql/$DB_HOST" ]]; then
+    execute_sql_files "/scripts/sql/$DB_HOST"
+fi
 
-echo "All SQL scripts executed successfully."
-
+echo "SQL execution completed for $DB_HOST."

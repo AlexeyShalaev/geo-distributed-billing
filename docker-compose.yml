@@ -1,46 +1,55 @@
 services:
-  ru-central1-a:
+  postgres1:
     image: postgres:17
-    container_name: ru-central1-a
+    container_name: postgres1
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
       POSTGRES_DB: shared_db
+      DB_HOST: postgres1
     volumes:
-      - ./data/ru-central1-a:/var/lib/postgresql/data
-      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./data/postgres1:/var/lib/postgresql/data
+      - ./run_sql.sh:/docker-entrypoint-initdb.d/run_sql.sh
+      - ./sql:/scripts/sql
     ports:
-      - "15432:5432"
+      - "5432:5432"
+    command: ["bash", "/docker-entrypoint-initdb.d/run_sql.sh"]
     networks:
       - postgres_net
 
-  us-gov-east-1:
+  postgres2:
     image: postgres:17
-    container_name: us-gov-east-1
+    container_name: postgres2
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
       POSTGRES_DB: shared_db
+      DB_HOST: postgres2
     volumes:
-      - ./data/us-gov-east-1:/var/lib/postgresql/data
-      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./data/postgres2:/var/lib/postgresql/data
+      - ./run_sql.sh:/docker-entrypoint-initdb.d/run_sql.sh
+      - ./sql:/scripts/sql
     ports:
-      - "15433:5432"
+      - "5433:5432"
+    command: ["bash", "/docker-entrypoint-initdb.d/run_sql.sh"]
     networks:
       - postgres_net
 
-  eu-west-2:
+  postgres3:
     image: postgres:17
-    container_name: eu-west-2
+    container_name: postgres3
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
       POSTGRES_DB: shared_db
+      DB_HOST: postgres3
     volumes:
-      - ./data/eu-west-2:/var/lib/postgresql/data
-      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./data/postgres3:/var/lib/postgresql/data
+      - ./run_sql.sh:/docker-entrypoint-initdb.d/run_sql.sh
+      - ./sql:/scripts/sql
     ports:
-      - "15434:5432"
+      - "5434:5432"
+    command: ["bash", "/docker-entrypoint-initdb.d/run_sql.sh"]
     networks:
       - postgres_net
 
