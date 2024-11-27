@@ -7,7 +7,7 @@ CREATE DATABASE example_db;
 -- Создание таблицы services
 CREATE TABLE example_table (
     id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
+    name TEXT NOT NULL
 );
 
 -- Пример вставки данных

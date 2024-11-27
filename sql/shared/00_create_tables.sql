@@ -2,7 +2,7 @@
 \c shared_db
 
 -- Создание таблицы services
-CREATE TABLE services (
+CREATE TABLE IF NOT EXISTS services (
     id SERIAL PRIMARY KEY,       -- Уникальный идентификатор услуги
     name TEXT NOT NULL,          -- Название услуги
     price NUMERIC(10, 2) NOT NULL, -- Цена услуги

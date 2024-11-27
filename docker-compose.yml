@@ -1,4 +1,17 @@
 services:
+  psql-client:
+    image: postgres:17
+    container_name: psql-client
+    networks:
+      - postgres_net
+    entrypoint: ["sleep", "infinity"]
+    volumes:
+      - ./sql:/sql:ro
+    depends_on:
+      - postgres1
+      - postgres2
+      - postgres3
+
   postgres1:
     image: postgres:17
     container_name: postgres1
@@ -9,13 +22,13 @@ services:
       DB_HOST: postgres1
     volumes:
       - ./data/postgres1:/var/lib/postgresql/data
-      - ./run_sql.sh:/docker-entrypoint-initdb.d/run_sql.sh
-      - ./sql:/scripts/sql
     ports:
-      - "5432:5432"
-    command: ["bash", "/docker-entrypoint-initdb.d/run_sql.sh"]
+      - "15432:5432"
     networks:
       - postgres_net
+    command: >
+      bash -c "apt-get update && apt-get install -y postgresql-17-pglogical &&
+               docker-entrypoint.sh postgres"
 
   postgres2:
     image: postgres:17
@@ -27,13 +40,13 @@ services:
       DB_HOST: postgres2
     volumes:
       - ./data/postgres2:/var/lib/postgresql/data
-      - ./run_sql.sh:/docker-entrypoint-initdb.d/run_sql.sh
-      - ./sql:/scripts/sql
     ports:
-      - "5433:5432"
-    command: ["bash", "/docker-entrypoint-initdb.d/run_sql.sh"]
+      - "15433:5432"
     networks:
       - postgres_net
+    command: >
+      bash -c "apt-get update && apt-get install -y postgresql-17-pglogical &&
+               docker-entrypoint.sh postgres"
 
   postgres3:
     image: postgres:17
@@ -45,13 +58,13 @@ services:
       DB_HOST: postgres3
     volumes:
       - ./data/postgres3:/var/lib/postgresql/data
-      - ./run_sql.sh:/docker-entrypoint-initdb.d/run_sql.sh
-      - ./sql:/scripts/sql
     ports:
-      - "5434:5432"
-    command: ["bash", "/docker-entrypoint-initdb.d/run_sql.sh"]
+      - "15434:5432"
     networks:
       - postgres_net
+    command: >
+      bash -c "apt-get update && apt-get install -y postgresql-17-pglogical &&
+               docker-entrypoint.sh postgres"
 
 networks:
   postgres_net:
