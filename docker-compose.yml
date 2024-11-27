@@ -1,0 +1,49 @@
+services:
+  ru-central1-a:
+    image: postgres:17
+    container_name: ru-central1-a
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: shared_db
+    volumes:
+      - ./data/ru-central1-a:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "15432:5432"
+    networks:
+      - postgres_net
+
+  us-gov-east-1:
+    image: postgres:17
+    container_name: us-gov-east-1
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: shared_db
+    volumes:
+      - ./data/us-gov-east-1:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "15433:5432"
+    networks:
+      - postgres_net
+
+  eu-west-2:
+    image: postgres:17
+    container_name: eu-west-2
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: shared_db
+    volumes:
+      - ./data/eu-west-2:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "15434:5432"
+    networks:
+      - postgres_net
+
+networks:
+  postgres_net:
+    driver: bridge
