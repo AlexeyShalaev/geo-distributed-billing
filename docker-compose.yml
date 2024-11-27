@@ -20,15 +20,15 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: shared_db
       DB_HOST: postgres1
-    volumes:
-      - ./data/postgres1:/var/lib/postgresql/data
+    #volumes:
+    #  - ./data/postgres1:/var/lib/postgresql/data
     ports:
       - "15432:5432"
     networks:
       - postgres_net
     command: >
       bash -c "apt-get update && apt-get install -y postgresql-17-pglogical &&
-               docker-entrypoint.sh postgres"
+               docker-entrypoint.sh postgres -c shared_preload_libraries=pglogical -с wal_level=logical"
 
   postgres2:
     image: postgres:17
@@ -38,15 +38,15 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: shared_db
       DB_HOST: postgres2
-    volumes:
-      - ./data/postgres2:/var/lib/postgresql/data
+    #volumes:
+    #  - ./data/postgres2:/var/lib/postgresql/data
     ports:
       - "15433:5432"
     networks:
       - postgres_net
     command: >
       bash -c "apt-get update && apt-get install -y postgresql-17-pglogical &&
-               docker-entrypoint.sh postgres"
+               docker-entrypoint.sh postgres -c shared_preload_libraries=pglogical"
 
   postgres3:
     image: postgres:17
@@ -56,15 +56,15 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: shared_db
       DB_HOST: postgres3
-    volumes:
-      - ./data/postgres3:/var/lib/postgresql/data
+    #volumes:
+    #  - ./data/postgres3:/var/lib/postgresql/data
     ports:
       - "15434:5432"
     networks:
       - postgres_net
     command: >
       bash -c "apt-get update && apt-get install -y postgresql-17-pglogical &&
-               docker-entrypoint.sh postgres"
+               docker-entrypoint.sh postgres -c shared_preload_libraries=pglogical"
 
 networks:
   postgres_net:

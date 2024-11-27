@@ -29,14 +29,18 @@ execute_sql() {
     done
 }
 
-# Выполнение общих скриптов (только на node1)
+# Выполнение общих скриптов (shared) на всех нодах
 if [[ -d "./shared" ]]; then
-    execute_sql "node1" "${nodes[node1]}" "./shared"
+    for node in "${!nodes[@]}"; do
+        echo "Executing shared scripts on $node..."
+        execute_sql "$node" "${nodes[$node]}" "./shared"
+    done
 fi
 
-# Выполнение уникальных скриптов для каждой ноды
-for node in "${!nodes[@]}"; do
+# Выполнение уникальных скриптов для каждой ноды в фиксированном порядке
+for node in node1 node2 node3; do
     if [[ -d "./$node" ]]; then
+        echo "Executing unique scripts on $node..."
         execute_sql "$node" "${nodes[$node]}" "./$node"
     fi
 done
