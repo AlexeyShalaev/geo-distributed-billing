@@ -55,7 +55,7 @@ services:
       - postgres_net
     command: >
       bash -c "apt-get update && apt-get install -y postgresql-17-pglogical &&
-               docker-entrypoint.sh postgres -c shared_preload_libraries=pglogical"
+               docker-entrypoint.sh postgres -c shared_preload_libraries=pglogical -c wal_level=logical"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready", "-d", "shared_db"]
       interval: 10s
@@ -78,7 +78,7 @@ services:
       - postgres_net
     command: >
       bash -c "apt-get update && apt-get install -y postgresql-17-pglogical &&
-               docker-entrypoint.sh postgres -c shared_preload_libraries=pglogical"
+               docker-entrypoint.sh postgres -c shared_preload_libraries=pglogical -c wal_level=logical"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready", "-d", "shared_db"]
       interval: 10s

@@ -8,3 +8,24 @@ CREATE TABLE IF NOT EXISTS services (
     price NUMERIC(10, 2) NOT NULL, -- Цена услуги
     currency CHAR(3) NOT NULL    -- Валюта услуги (например, USD, EUR)
 );
+
+CREATE TABLE account_balances (
+    id SERIAL PRIMARY KEY,            -- Уникальный идентификатор записи
+    account_id INT NOT NULL,          -- ID аккаунта
+    node_id INT NOT NULL,             -- ID узла (датацентра)
+    balance NUMERIC NOT NULL,         -- Баланс аккаунта
+);
+
+CREATE TABLE node_config (
+    node_id INT PRIMARY KEY,          -- ID узла
+    dsn TEXT NOT NULL                 -- Строка подключения к узлу
+);
+
+CREATE TABLE transaction_log (
+    id SERIAL PRIMARY KEY,           -- Уникальный идентификатор записи
+    account_id INT NOT NULL,         -- ID аккаунта
+    node_id INT NOT NULL,            -- Узел, инициировавший операцию
+    operation_type TEXT NOT NULL,    -- Тип операции ('deposit' / 'withdraw')
+    amount NUMERIC NOT NULL,         -- Сумма операции
+    timestamp TIMESTAMP DEFAULT NOW()-- Время операции
+);
