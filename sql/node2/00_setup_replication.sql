@@ -9,7 +9,7 @@ SELECT pglogical.create_node(
 
 -- Настроим подписку на публикацию от postgres1
 SELECT pglogical.create_subscription(
-    subscription_name := 'subscription_from_node1',
+    subscription_name := 'subscription_from_node1_to_node2',
     provider_dsn := 'host=postgres1 dbname=shared_db user=admin password=password',
     replication_sets := ARRAY['default']
 );

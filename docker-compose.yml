@@ -4,13 +4,17 @@ services:
     container_name: psql-client
     networks:
       - postgres_net
-    entrypoint: ["sleep", "infinity"]
+    working_dir: /sql
+    entrypoint: ["./run_sql.sh"]
     volumes:
       - ./sql:/sql:ro
     depends_on:
-      - postgres1
-      - postgres2
-      - postgres3
+      postgres1:
+        condition: service_healthy
+      postgres2:
+        condition: service_healthy
+      postgres3:
+        condition: service_healthy
 
   postgres1:
     image: postgres:17
@@ -29,6 +33,11 @@ services:
     command: >
       bash -c "apt-get update && apt-get install -y postgresql-17-pglogical &&
                docker-entrypoint.sh postgres -c shared_preload_libraries=pglogical -c wal_level=logical"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "shared_db"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
   postgres2:
     image: postgres:17
@@ -47,6 +56,11 @@ services:
     command: >
       bash -c "apt-get update && apt-get install -y postgresql-17-pglogical &&
                docker-entrypoint.sh postgres -c shared_preload_libraries=pglogical"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "shared_db"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
   postgres3:
     image: postgres:17
@@ -65,6 +79,11 @@ services:
     command: >
       bash -c "apt-get update && apt-get install -y postgresql-17-pglogical &&
                docker-entrypoint.sh postgres -c shared_preload_libraries=pglogical"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "shared_db"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
 networks:
   postgres_net:
