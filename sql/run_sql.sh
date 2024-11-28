@@ -29,11 +29,11 @@ execute_sql() {
     done
 }
 
-# Выполнение общих скриптов (shared) на всех нодах
-if [[ -d "./shared" ]]; then
+# Выполнение общих скриптов (all) на всех нодах
+if [[ -d "./all" ]]; then
     for node in "${!nodes[@]}"; do
-        echo "Executing shared scripts on $node..."
-        execute_sql "$node" "${nodes[$node]}" "./shared"
+        echo "Executing all scripts on $node..."
+        execute_sql "$node" "${nodes[$node]}" "./all"
     done
 fi
 
