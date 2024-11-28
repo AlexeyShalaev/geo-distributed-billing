@@ -13,7 +13,7 @@ CREATE TABLE account_balances (
     id SERIAL PRIMARY KEY,            -- Уникальный идентификатор записи
     account_id INT NOT NULL,          -- ID аккаунта
     node_id INT NOT NULL,             -- ID узла (датацентра)
-    balance NUMERIC NOT NULL,         -- Баланс аккаунта
+    balance NUMERIC NOT NULL         -- Баланс аккаунта
 );
 
 CREATE TABLE node_config (
