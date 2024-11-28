@@ -7,9 +7,14 @@ SELECT pglogical.create_node(
     dsn := 'host=postgres3 dbname=shared_db user=admin password=password'
 );
 
--- Настроим подписку на публикацию от postgres1
-SELECT pglogical.create_subscription(
-    subscription_name := 'subscription_from_node1_to_node3',
-    provider_dsn := 'host=postgres1 dbname=shared_db user=admin password=password',
-    replication_sets := ARRAY['default']
+-- Настроим публикацию для общих таблиц
+SELECT pglogical.create_replication_set(
+    set_name := 'default',
+    replicate_insert := true,
+    replicate_update := true,
+    replicate_delete := true,
+    replicate_truncate := false
 );
+
+-- Добавим таблицы к публикации
+SELECT pglogical.replication_set_add_all_tables('default', ARRAY['public']);
