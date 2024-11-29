@@ -29,20 +29,24 @@ execute_sql() {
     done
 }
 
-# Выполнение общих скриптов (all) на всех нодах
-if [[ -d "./all" ]]; then
-    for node in "${!nodes[@]}"; do
-        echo "Executing all scripts on $node..."
-        execute_sql "$node" "${nodes[$node]}" "./all"
-    done
-fi
+for stage in stage1 stage2; do
 
-# Выполнение уникальных скриптов для каждой ноды в фиксированном порядке
-for node in node1 node2 node3; do
-    if [[ -d "./$node" ]]; then
-        echo "Executing unique scripts on $node..."
-        execute_sql "$node" "${nodes[$node]}" "./$node"
+    # Выполнение общих скриптов (all) на всех нодах
+    if [[ -d "./$stage/all" ]]; then
+        for node in "${!nodes[@]}"; do
+            echo "Executing all scripts on $node..."
+            execute_sql "$node" "${nodes[$node]}" "./$stage/all"
+        done
     fi
+
+    # Выполнение уникальных скриптов для каждой ноды в фиксированном порядке
+    for node in node1 node2 node3; do
+        if [[ -d "./$stage/$node" ]]; then
+            echo "Executing unique scripts on $node..."
+            execute_sql "$node" "${nodes[$node]}" "./$stage/$node"
+        fi
+    done
+
 done
 
 echo "All SQL scripts executed successfully."

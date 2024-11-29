@@ -1,6 +1,3 @@
--- Установим расширение pglogical, если оно еще не установлено
-CREATE EXTENSION IF NOT EXISTS pglogical;
-
 -- Создадим узел логической репликации
 SELECT pglogical.create_node(
     node_name := 'node3',
