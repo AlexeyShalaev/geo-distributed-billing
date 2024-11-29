@@ -29,7 +29,7 @@ execute_sql() {
     done
 }
 
-for stage in stage1 stage2; do
+for stage in stage1 stage2 stage3; do
 
     # Выполнение общих скриптов (all) на всех нодах
     if [[ -d "./$stage/all" ]]; then

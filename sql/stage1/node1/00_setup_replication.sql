@@ -18,3 +18,13 @@ SELECT pglogical.replication_set_add_table(
     relation := 'account_balances',
     row_filter := 'node_id = 1' -- Только строки с node_id = 1
 );
+
+SELECT pglogical.replication_set_add_table(
+    set_name := 'node1_set',
+    relation := 'node_config'
+);
+
+SELECT pglogical.replication_set_add_table(
+    set_name := 'node1_set',
+    relation := 'services'
+);
