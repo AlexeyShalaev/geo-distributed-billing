@@ -1,5 +1,5 @@
--- Переключение на базу данных shared_db
-\c shared_db
+-- Переключение на базу данных billing
+\c billing
 
 SELECT add_account(1, 1000, 1);
 SELECT add_account(2, 2000, 1);

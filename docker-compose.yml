@@ -22,7 +22,7 @@ services:
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: shared_db
+      POSTGRES_DB: billing
       DB_HOST: postgres1
     volumes:
       - ./pgcrypto_key.txt:/pgcrypto_key.txt:ro
@@ -35,7 +35,7 @@ services:
       bash -c "apt-get update && apt-get install -y postgresql-17-pglogical &&
                docker-entrypoint.sh postgres -c shared_preload_libraries=pglogical -c wal_level=logical"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready", "-d", "shared_db"]
+      test: [ "CMD-SHELL", "pg_isready", "-d", "billing"]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -46,7 +46,7 @@ services:
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: shared_db
+      POSTGRES_DB: billing
       DB_HOST: postgres2
     volumes:
       - ./pgcrypto_key.txt:/pgcrypto_key.txt:ro
@@ -59,7 +59,7 @@ services:
       bash -c "apt-get update && apt-get install -y postgresql-17-pglogical &&
                docker-entrypoint.sh postgres -c shared_preload_libraries=pglogical -c wal_level=logical"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready", "-d", "shared_db"]
+      test: [ "CMD-SHELL", "pg_isready", "-d", "billing"]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -70,7 +70,7 @@ services:
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: shared_db
+      POSTGRES_DB: billing
       DB_HOST: postgres3
     volumes:
       - ./pgcrypto_key.txt:/pgcrypto_key.txt:ro
@@ -83,7 +83,7 @@ services:
       bash -c "apt-get update && apt-get install -y postgresql-17-pglogical &&
                docker-entrypoint.sh postgres -c shared_preload_libraries=pglogical -c wal_level=logical"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready", "-d", "shared_db"]
+      test: [ "CMD-SHELL", "pg_isready", "-d", "billing"]
       interval: 10s
       timeout: 3s
       retries: 3

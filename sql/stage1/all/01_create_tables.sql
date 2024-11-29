@@ -1,5 +1,5 @@
--- Переключение на базу данных shared_db
-\c shared_db
+-- Переключение на базу данных billing
+\c billing
 
 -- Создание таблицы services
 CREATE TABLE IF NOT EXISTS services (

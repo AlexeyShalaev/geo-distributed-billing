@@ -1,7 +1,7 @@
 -- Создадим узел логической репликации
 SELECT pglogical.create_node(
     node_name := 'node3',
-    dsn := 'host=postgres3 dbname=shared_db user=admin password=password'
+    dsn := 'host=postgres3 dbname=billing user=admin password=password'
 );
 
 -- Настроим публикацию для общих таблиц

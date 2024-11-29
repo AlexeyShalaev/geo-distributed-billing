@@ -2,9 +2,9 @@
 
 # Настройки подключения
 declare -A nodes=(
-    [node1]="postgres1 5432 admin password shared_db"
-    [node2]="postgres2 5432 admin password shared_db"
-    [node3]="postgres3 5432 admin password shared_db"
+    [node1]="postgres1 5432 admin password billing"
+    [node2]="postgres2 5432 admin password billing"
+    [node3]="postgres3 5432 admin password billing"
 )
 
 # Функция для выполнения SQL-файлов

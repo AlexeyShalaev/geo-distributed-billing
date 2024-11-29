@@ -1,5 +1,5 @@
--- Переключение на базу данных shared_db
-\c shared_db
+-- Переключение на базу данных billing
+\c billing
 
 -- Пример вставки данных в таблицу
 INSERT INTO services (name, price, currency)
