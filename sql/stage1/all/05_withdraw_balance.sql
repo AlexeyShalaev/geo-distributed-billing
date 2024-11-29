@@ -21,6 +21,9 @@ BEGIN
         WHERE account_balances.account_id = withdraw_balance.account_id
           AND account_balances.node_id = withdraw_balance.local_node_id;
 
+        -- Логируем транзакцию
+        PERFORM log_transaction(account_id, local_node_id, 'withdraw', amount);
+
         RAISE NOTICE 'Withdrawn % from local balance on node %. Replication will sync changes.', amount, local_node_id;
         RETURN;
     END IF;
@@ -66,6 +69,9 @@ BEGIN
 
         RAISE NOTICE 'Sent withdraw request to node %.', node_balances.node_id;
     END LOOP;
+
+    -- Логируем транзакцию после завершения
+    PERFORM log_transaction(account_id, local_node_id, 'withdraw', amount);
 
     RAISE NOTICE 'Withdrawn %. Requests sent to other nodes.', amount;
 
