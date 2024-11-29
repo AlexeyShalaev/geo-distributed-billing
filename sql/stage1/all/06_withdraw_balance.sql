@@ -5,7 +5,7 @@ DECLARE
     total_balance NUMERIC;                 -- Суммарный баланс по всем нодам
     needed_balance NUMERIC;                -- Необходимая сумма для снятия
     node_balances RECORD;                  -- Запись для итерации по другим узлам
-    remote_dsn TEXT;                       -- Строка подключения к узлу
+    remote_dsn TEXT;                       -- Расшифрованная строка подключения к узлу
 BEGIN
     -- Получаем локальный баланс
     SELECT balance INTO local_balance
@@ -54,8 +54,8 @@ BEGIN
         WHERE account_balances.account_id = withdraw_balance.account_id
           AND account_balances.node_id <> withdraw_balance.local_node_id
     LOOP
-        -- Получаем строку подключения для узла
-        SELECT node_config.dsn INTO remote_dsn
+        -- Расшифровываем строку подключения для узла
+        SELECT pgp_sym_decrypt(node_config.encrypted_dsn::bytea, get_encryption_key()) INTO remote_dsn
         FROM node_config
         WHERE node_config.node_id = node_balances.node_id;
 

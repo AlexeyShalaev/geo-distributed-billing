@@ -10,8 +10,8 @@ DECLARE
     distributed_balance NUMERIC; -- Равномерный баланс для каждой ноды
     remainder NUMERIC;           -- Остаток, который будет добавлен одной ноде
     is_remainder_distributed BOOLEAN := FALSE; -- Флаг, указывает, был ли распределён остаток
+    decrypted_dsn TEXT;          -- Расшифрованная строка подключения
     connections TEXT[] := ARRAY[]::TEXT[]; -- Список активных подключений
-    conn_name TEXT;              -- Имя текущего подключения
 BEGIN
     -- Подсчитать количество нод
     SELECT COUNT(*) INTO node_count FROM node_config;
@@ -21,22 +21,21 @@ BEGIN
     remainder := total_balance - (distributed_balance * node_count);
 
     -- Начинаем транзакцию на всех нодах
-    FOR node IN SELECT * FROM node_config LOOP
+    FOR node IN SELECT node_id, pgp_sym_decrypt(encrypted_dsn, get_encryption_key()) AS decrypted_dsn FROM node_config LOOP
         BEGIN
             -- Устанавливаем соединение через dblink
-            conn_name := 'conn_' || node.node_id;
-            PERFORM dblink_connect(conn_name, node.dsn);
-            connections := array_append(connections, conn_name);
+            PERFORM dblink_connect('conn_' || node.node_id, node.decrypted_dsn);
+            connections := array_append(connections, 'conn_' || node.node_id);
 
             -- Открываем транзакцию
-            PERFORM dblink_exec(conn_name, 'BEGIN');
+            PERFORM dblink_exec('conn_' || node.node_id, 'BEGIN');
         EXCEPTION WHEN OTHERS THEN
             RAISE EXCEPTION 'Failed to connect or start transaction on node %.', node.node_id;
         END;
     END LOOP;
 
     -- Вставляем данные
-    FOR node IN SELECT * FROM node_config LOOP
+    FOR node IN SELECT node_id, pgp_sym_decrypt(encrypted_dsn, get_encryption_key()) AS decrypted_dsn FROM node_config LOOP
         BEGIN
             IF node.node_id = local_node_id THEN
                 -- Добавляем запись на локальную ноду

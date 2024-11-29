@@ -17,8 +17,8 @@ CREATE TABLE account_balances (
 );
 
 CREATE TABLE node_config (
-    node_id INT PRIMARY KEY,          -- ID узла
-    dsn TEXT NOT NULL                 -- Строка подключения к узлу
+    node_id INT PRIMARY KEY,                    -- ID ноды
+    encrypted_dsn BYTEA NOT NULL                -- Зашифрованная строка подключения
 );
 
 CREATE TABLE transaction_log (

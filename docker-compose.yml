@@ -24,7 +24,8 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: shared_db
       DB_HOST: postgres1
-    #volumes:
+    volumes:
+      - ./pgcrypto_key.txt:/pgcrypto_key.txt:ro
     #  - ./data/postgres1:/var/lib/postgresql/data
     ports:
       - "15432:5432"
@@ -47,7 +48,8 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: shared_db
       DB_HOST: postgres2
-    #volumes:
+    volumes:
+      - ./pgcrypto_key.txt:/pgcrypto_key.txt:ro
     #  - ./data/postgres2:/var/lib/postgresql/data
     ports:
       - "15433:5432"
@@ -70,7 +72,8 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: shared_db
       DB_HOST: postgres3
-    #volumes:
+    volumes:
+      - ./pgcrypto_key.txt:/pgcrypto_key.txt:ro
     #  - ./data/postgres3:/var/lib/postgresql/data
     ports:
       - "15434:5432"
