@@ -10,10 +10,10 @@ CREATE TABLE IF NOT EXISTS services (
 );
 
 CREATE TABLE account_balances (
-    id SERIAL PRIMARY KEY,            -- Уникальный идентификатор записи
-    account_id INT NOT NULL,          -- ID аккаунта
-    node_id INT NOT NULL,             -- ID узла (датацентра)
-    balance NUMERIC NOT NULL         -- Баланс аккаунта
+    account_id INT NOT NULL,       -- ID аккаунта
+    node_id INT NOT NULL,          -- ID узла
+    balance NUMERIC NOT NULL,      -- Баланс аккаунта
+    PRIMARY KEY (account_id, node_id) -- Составной первичный ключ
 );
 
 CREATE TABLE node_config (
