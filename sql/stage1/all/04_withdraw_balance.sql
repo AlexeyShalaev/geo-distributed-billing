@@ -48,7 +48,7 @@ BEGIN
     LOOP
         -- Отправляем запрос в удалённый датацентр
         PERFORM dblink_exec(
-            'host=' || (SELECT dsn FROM node_config WHERE node_id = node_balances.node_id),
+            node.dsn,
             'SELECT process_withdraw(' || account_id || ', ' ||
             needed_balance * (node_balances.balance / (total_balance - local_balance)) || ');'
         );
