@@ -7,6 +7,19 @@ DECLARE
     node_balances RECORD;                  -- Запись для итерации по другим узлам
     remote_dsn TEXT;                       -- Расшифрованная строка подключения к узлу
 BEGIN
+    -- Проверяем, что запись о балансе существует
+    IF NOT EXISTS (
+        SELECT 1 FROM account_balances
+        WHERE account_id = account_id AND node_id = local_node_id
+    ) THEN
+        RAISE EXCEPTION 'No balance record found for account % on node %', account_id, local_node_id;
+    END IF;
+
+    -- Проверяем, что сумма положительна
+    IF amount <= 0 THEN
+        RAISE EXCEPTION 'Withdrawal amount must be positive';
+    END IF;
+
     -- Получаем локальный баланс
     SELECT balance INTO local_balance
     FROM account_balances
