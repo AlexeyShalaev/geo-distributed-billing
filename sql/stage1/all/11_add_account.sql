@@ -5,9 +5,8 @@ CREATE OR REPLACE FUNCTION add_account(
 )
 RETURNS VOID AS $$
 DECLARE
-    new_account_id INT;         -- ID нового аккаунта
-    node RECORD;                -- Для итерации по нодам
-    conn_name TEXT;             -- Имя подключения
+    new_account_id INT;
+    node RECORD;
 BEGIN
     -- Проверка имени пользователя
     IF p_username IS NULL OR TRIM(p_username) = '' THEN
@@ -37,62 +36,55 @@ BEGIN
         RAISE EXCEPTION 'Account with username % already exists.', p_username;
     END IF;
 
-    RAISE NOTICE 'Local account created with ID %.', new_account_id;
-
     -- Распространение аккаунта на все удалённые ноды через dblink
     FOR node IN 
-        SELECT node_id, pgp_sym_decrypt(encrypted_dsn::bytea, get_encryption_key()) AS decrypted_dsn 
-        FROM node_config
+        SELECT node_id FROM node_config
     LOOP
-        -- Пропуск локальной ноды, так как аккаунт уже создан
         IF node.node_id = p_node_id THEN
+            -- Пропуск локальной ноды, так как аккаунт уже создан
             CONTINUE;
         END IF;
 
-        -- Проверка корректности decrypted_dsn
-        IF node.decrypted_dsn IS NULL OR TRIM(node.decrypted_dsn) = '' THEN
-            RAISE EXCEPTION 'Decrypted DSN for node % is invalid.', node.node_id;
-        END IF;
-
-        -- Установка соединения через dblink
-        BEGIN
-            -- Отключение, если соединение с таким именем уже существует
-            BEGIN
-                PERFORM dblink_disconnect('conn_' || node.node_id);
-            EXCEPTION WHEN OTHERS THEN
-                -- Игнорировать ошибку, если соединение не существует
-            END;
-
-            PERFORM dblink_connect('conn_' || node.node_id, node.decrypted_dsn);
-            RAISE NOTICE 'Connected to node %.', node.node_id;
-
-            -- Вставка аккаунта на удалённом узле
-            PERFORM dblink_exec(
-                'conn_' || node.node_id,
-                format(
-                    'INSERT INTO accounts (username) VALUES (%L);',
-                    p_username
-                )
-            );
-            RAISE NOTICE 'Account % inserted on node %.', p_username, node.node_id;
-
-            -- Отключение после вставки
-            PERFORM dblink_disconnect('conn_' || node.node_id);
-            RAISE NOTICE 'Disconnected from node %.', node.node_id;
-        EXCEPTION WHEN OTHERS THEN
-            -- Откат транзакции при ошибке и отключение
-            PERFORM dblink_disconnect('conn_' || node.node_id);
-            RAISE EXCEPTION 'Failed to connect or insert account on node %. Details: %', node.node_id, SQLERRM;
-        END;
+        -- Добавление аккаунта на удалённой ноде
+        PERFORM add_account_to_node(p_username, node.node_id);
     END LOOP;
 
     -- Добавление начального баланса для новой записи в account_balances
     PERFORM add_account_balance(new_account_id, p_initial_balance, p_node_id);
 
-    RAISE NOTICE 'Account was added successfully with ID % and initial balance % on node %.', 
-                new_account_id, p_initial_balance, p_node_id;
+    RAISE NOTICE 'Account was added successfully with ID % and initial balance % on all nodes.', 
+                new_account_id, p_initial_balance;
 
 EXCEPTION WHEN OTHERS THEN
     RAISE EXCEPTION 'Transaction failed: %', SQLERRM;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Эта функция добавляет аккаунт на указанную ноду
+CREATE OR REPLACE FUNCTION add_account_to_node(
+    p_username TEXT,
+    p_node_id INT
+)
+RETURNS VOID AS $$
+DECLARE
+    conn_name TEXT;
+BEGIN
+    -- Удалённая вставка через dblink
+    conn_name := connect_to_node(p_node_id);
+    PERFORM execute_remote_query(
+        conn_name,
+        format(
+            'INSERT INTO accounts (username) VALUES (%L);',
+            p_username
+        )
+    );
+    RAISE NOTICE 'Account % inserted on node %.', p_username, p_node_id;
+    PERFORM disconnect_from_node(conn_name);
+EXCEPTION WHEN OTHERS THEN
+    -- Обеспечение отключения в случае ошибки
+    IF conn_name IS NOT NULL THEN
+        PERFORM disconnect_from_node(conn_name);
+    END IF;
+    RAISE;
 END;
 $$ LANGUAGE plpgsql;
