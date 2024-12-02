@@ -4,7 +4,7 @@
 -- Создание таблицы accounts
 CREATE TABLE accounts (
     id SERIAL PRIMARY KEY,
-    username TEXT NOT NULL,
+    username TEXT UNIQUE NOT NULL,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE
 );
 
