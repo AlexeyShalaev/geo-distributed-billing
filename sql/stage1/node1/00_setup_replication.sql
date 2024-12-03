@@ -28,3 +28,8 @@ SELECT pglogical.replication_set_add_table(
     set_name := 'node1_set',
     relation := 'services'
 );
+
+SELECT pglogical.replication_set_add_table(
+    set_name := 'node1_set',
+    relation := 'accounts'
+);
